@@ -9,7 +9,7 @@ What You'll Learn:
 - Inserting data (Create)
 - Reading data (Read)
 
-Prerequisites: You should know Flask basics (routes, templates, render_template)
+# Prerequisites: You should know Flask basics (routes, templates, render_template)
 """
 
 from flask import Flask, render_template
@@ -17,59 +17,94 @@ import sqlite3  # Built-in Python library for SQLite database
 
 app = Flask(__name__)
 
-DATABASE = 'students.db'  # Database file name (will be created automatically)
+DATABASE = {
+     'students':'students.db',
+    'courses':'courses.db'
+    }  # Database file name (will be created automatically)
 
 
 # =============================================================================
 # DATABASE HELPER FUNCTIONS
 # =============================================================================
 
-def get_db_connection():
+def get_db_connection(db_name):
     """Create a connection to the database"""
-    conn = sqlite3.connect(DATABASE)  # Connect to database file
+    conn = sqlite3.connect(DATABASE[db_name])  # Connect to database file
     conn.row_factory = sqlite3.Row  # This allows accessing columns by name (like dict)
     return conn
 
 
 def init_db():
     """Create the table if it doesn't exist"""
-    conn = get_db_connection()
-    conn.execute('''
+    conn = get_db_connection('students')
+    conn.execute ('''
         CREATE TABLE IF NOT EXISTS students (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL,
-            course TEXT NOT NULL
+                  student_name TEXT NOT NULL,
+                  email TEXT NOT NULL,
+                  course TEXT NOT NULL
         )
-    ''')  # SQL command to create table with 4 columns
+    ''')
+    conn = get_db_connection('courses')
+    conn.execute ('''
+        CREATE TABLE IF NOT EXISTS courses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            course_name TEXT NOT NULL
+        )
+    ''')  # SQL command to create table with 2 columns
     conn.commit()  # Save changes to database
     conn.close()  # Close connection
 
 
-# =============================================================================
+# 
+# 
+# 
+# 
+# =================================================================
 # ROUTES
 # =============================================================================
 
 @app.route('/')
 def index():
     """Home page - Display all students from database"""
-    conn = get_db_connection()  # Step 1: Connect to database
+    conn = get_db_connection('students')  # Step 1: Connect to database
     students = conn.execute('SELECT * FROM students').fetchall()  # Step 2: Get all rows
     conn.close()  # Step 3: Close connection
-    return render_template('index.html', students=students)
+
+    """Home page - Display all courses from database"""
+    conn = get_db_connection('courses')  # Step 1: Connect to database
+    courses = conn.execute('SELECT * FROM courses').fetchall()  # Step 2: Get all rows
+    conn.close()  # Step 3: Close connection
+    return render_template('index.html', students=students,courses=courses)
+    
 
 
-@app.route('/add')
+@app.route('/add-student')
+
 def add_sample_student():
-    """Add a sample student to database (for testing)"""
-    conn = get_db_connection()
+    """Add a sample course to database (for testing)"""
+    conn = get_db_connection('students')
     conn.execute(
-        'INSERT INTO students (name, email, course) VALUES (?, ?, ?)',
-        ('John Doe', 'john@example.com', 'Python')  # ? are placeholders (safe from SQL injection)
-    )
+        'INSERT INTO students (name,email,course) VALUES (?,?,?)',
+        ( 'Daksh','daksh@email.com','CSS',)  # ? are placeholders (safe from SQL injection)
+        )
     conn.commit()  # Don't forget to commit!
     conn.close()
     return 'Student added! <a href="/">Go back to home</a>'
+
+
+@app.route('/add-course')
+
+def add_sample_course():
+    """Add a sample course to database (for testing)"""
+    conn = get_db_connection('courses')
+    conn.execute(
+        'INSERT INTO courses (course_name) VALUES (?)',
+        ( 'PYTHON',)  # ? are placeholders (safe from SQL injection)
+        )
+    conn.commit()  # Don't forget to commit!
+    conn.close()
+    return 'Course added! <a href="/">Go back to home</a>'
 
 
 if __name__ == '__main__':
