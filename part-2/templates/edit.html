@@ -3,21 +3,82 @@
 <head>
     <title>Edit Student - Part 2</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
-        h1 { color: #333; }
-        form { background: white; padding: 30px; border-radius: 8px; max-width: 400px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        input[type="text"], input[type="email"] {
-            width: 100%; padding: 10px; margin-bottom: 20px;
-            border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
-        }
-        input:focus { border-color: #2196F3; outline: none; }
-        .btn { padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; }
-        .btn-submit { background: #2196F3; color: white; }
-        .btn-cancel { background: #ccc; color: #333; margin-left: 10px; }
-        .btn:hover { opacity: 0.9; }
-        .info { background: #e3f2fd; padding: 10px; border-radius: 4px; margin-bottom: 20px; color: #1565c0; }
-    </style>
+/* =========================
+   EDIT PAGE (3D PREMIUM)
+========================= */
+body {
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #d9dbe0, #9c6af8);
+    margin: 0;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;   /* horizontal center */
+    justify-content: center; /* vertical center */
+}
+
+form {
+    max-width: 420px;
+    background: linear-gradient(135deg, #0f6aea, #97e4f2);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow:
+        0 35px 70px rgba(0,0,0,0.8),
+        inset 0 1px 3px rgba(255,255,255,0.1);
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: none;
+    background: #0d60e5;
+    color: white;
+}
+
+input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.5);
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #6366f1, #4338ca);
+    color: white;
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 12px 30px rgba(99,102,241,0.5);
+    margin-bottom: 20px;   /* 🔹 GAP BELOW MAIN BUTTON */
+
+}
+/* Cancel button */
+.btn-cancel {
+    display: block;              /* 🔹 allows centering */
+    width: fit-content;          /* 🔹 button size fits content */
+    margin: 0 auto;              /* 🔹 CENTER THE BUTTON */
+    padding: 14px 36px;
+    font-size: 16px;
+    border-radius: 32px;
+    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+
+}
+
+/* Hover effect */
+.btn-cancel:hover {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    transform: translateY(-2px);
+}
+
+
+</style>
+
 </head>
 <body>
     <h1>Edit Student</h1>
@@ -36,8 +97,7 @@
         <input type="text" id="course" name="course" value="{{ student['course'] }}" required>
 
         <button type="submit" class="btn btn-submit">Update Student</button>
-        <a href="{{ url_for('index') }}" class="btn btn-cancel">Cancel</a>
-    </form>
+       <a href="{{ url_for('index') }}" class="btn btn-submit btn-cancel">Cancel</a>    </form>
 
     <hr>
     <p><strong>Note:</strong> The form is pre-filled with current values using value="{% raw %}{{ student['field'] }}{% endraw %}" attribute</p>

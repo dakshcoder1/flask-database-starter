@@ -54,6 +54,14 @@ def add_student():
         course = request.form['course']
 
         conn = get_db_connection()
+        existing_student= conn.execute(
+            'SELECT * FROM students where email=?',(email,)).fetchone()
+        
+        if existing_student:
+            conn.close()
+            flash('Email already exists',"danger")
+            return redirect(url_for('index'))
+        
         conn.execute(
             'INSERT INTO students (name, email, course) VALUES (?, ?, ?)',
             (name, email, course)
@@ -74,7 +82,7 @@ def add_student():
 @app.route('/')
 def index():
     conn = get_db_connection()
-    students = conn.execute('SELECT * FROM students ORDER BY id DESC').fetchall()  # Newest first
+    students = conn.execute('SELECT * FROM students ORDER BY id ASC').fetchall()  # Newest first
     conn.close()
     return render_template('index.html', students=students)
 
@@ -94,7 +102,7 @@ def edit_student(id):
 
         conn.execute(
             'UPDATE students SET name = ?, email = ?, course = ? WHERE id = ?',
-            (name, email, course, id)  # Update WHERE id matches
+            (name, email, course,id)  # Update WHERE id matches
         )
         conn.commit()
         conn.close()
@@ -121,6 +129,17 @@ def delete_student(id):
 
     flash('Student deleted!', 'danger')  # Show delete message
     return redirect(url_for('index'))
+
+
+
+@app.route('/search')
+def search_student():
+    name = request.args.get('name')
+    conn = get_db_connection()
+    students= conn.execute('SELECT *FROM students WHERE name Like ?', ('%' + name + '%',)).fetchall()  # Remove row
+    conn.close()
+    return render_template('index.html', students=students)
+    
 
 
 if __name__ == '__main__':
