@@ -39,7 +39,7 @@ class Course(db.Model):  # Course table
 
     # Relationship: One Course has Many Students
     students = db.relationship('Student', backref='course', lazy=True)
-
+    teachers = db.relationship('Teacher', backref='course', lazy=True)
     def __repr__(self):  # How to display this object
         return f'<Course {self.name}>'
 
@@ -56,6 +56,18 @@ class Student(db.Model):  # Student table
         return f'<Student {self.name}>'
 
 
+class Teacher(db.Model):  # Teacher table
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)  # unique=True means no duplicates
+
+    # Foreign Key: Links  to a course
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Teacher {self.name}>'
+
+
 # =============================================================================
 # ROUTES - Using ORM instead of raw SQL
 # =============================================================================
@@ -65,13 +77,21 @@ def index():
     # OLD WAY (raw SQL): conn.execute('SELECT * FROM students').fetchall()
     # NEW WAY (ORM):
     students = Student.query.all()  # Get all students
-    return render_template('index.html', students=students)
+    teachers = Teacher.query.all()  # Get all teachers
+    return render_template('index.html', students=students,teachers=teachers)
 
 
 @app.route('/courses')
 def courses():
     all_courses = Course.query.all()  # Get all courses
-    return render_template('courses.html', courses=all_courses)
+    return render_template('courses.html', courses=all_courses,)
+
+
+@app.route('/teachers')
+def teachers():
+    print("---------------------")
+    all_teachers = Teacher.query.all()  # Get all teachers
+    return render_template('teachers.html', teachers=all_teachers,)
 
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -93,6 +113,25 @@ def add_student():
     courses = Course.query.all()  # Get courses for dropdown
     return render_template('add.html', courses=courses)
 
+@app.route('/add-teacher', methods=['GET', 'POST'])
+def add_teacher():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        course_id = request.form['course_id']
+
+        # OLD WAY: conn.execute('INSERT INTO students...')
+        # NEW WAY:
+        new_teacher = Teacher(name=name, email=email, course_id=course_id)  # Create object
+        db.session.add(new_teacher)  # Add to session
+        db.session.commit()  # Save to database
+
+        flash('Teacher added successfully!', 'success')
+        return redirect(url_for('index'))
+
+    courses = Course.query.all()  # Get courses for dropdown
+    return render_template('add_teacher.html', courses=courses)
+
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_student(id):
@@ -113,6 +152,25 @@ def edit_student(id):
     return render_template('edit.html', student=student, courses=courses)
 
 
+@app.route('/edit-teacher/<int:id>', methods=['GET', 'POST'])
+def edit_teacher(id):
+    # OLD WAY: conn.execute('SELECT * FROM teachers WHERE id = ?', (id,))
+    # NEW WAY:
+    teacher = Teacher.query.get_or_404(id)  # Get by ID or show 404 error
+
+    if request.method == 'POST':
+        teacher.name = request.form['name']  # Just update the object
+        teacher.email = request.form['email']
+        teacher.course_id = request.form['course_id']
+
+        db.session.commit()  # Save changes
+        flash('Teacher updated!', 'success')
+        return redirect(url_for('index'))
+
+    courses = Course.query.all()
+    return render_template('edit_teacher.html', teacher=teacher, courses=courses)
+
+
 @app.route('/delete/<int:id>')
 def delete_student(id):
     student = Student.query.get_or_404(id)
@@ -120,6 +178,16 @@ def delete_student(id):
     db.session.commit()
 
     flash('Student deleted!', 'danger')
+    return redirect(url_for('index'))
+
+
+@app.route('/delete_teacher/<int:id>')
+def delete_teacher(id):
+    teacher = Teacher.query.get_or_404(id)
+    db.session.delete(teacher)  # Delete the object
+    db.session.commit()
+
+    flash('Teacher deleted!', 'danger')
     return redirect(url_for('index'))
 
 
@@ -137,6 +205,35 @@ def add_course():
         return redirect(url_for('courses'))
 
     return render_template('add_course.html')
+
+@app.route('/filter-students')
+def filter_students():
+    # Get all students whose name contains 'John'
+    students = Student.query.filter(Student.name.like('%Daksh%')).all()
+    return render_template('index.html', students=students)
+
+
+@app.route('/top-students')
+def top_students():
+    students = Student.query.order_by(Student.id).limit(1).all()
+    return render_template('index.html', students=students)
+
+
+@app.route('/recent-students')
+def recent_students():
+    # Get last 3 students added whose name contains 'a', sorted by name descending
+    students = Student.query.filter(Student.name.like('%a%'))\
+                            .order_by(Student.name.asc())\
+                            .limit(3).all()
+    return render_template('index.html', students=students)
+@app.route('/recent-teachers')
+def recent_teachers():
+    # Get last 3 students added whose name contains 'a', sorted by name descending
+    teachers = Teacher.query.filter(Teacher.name.like('%a%'))\
+                            .order_by(Teacher.name.asc())\
+                            .limit(4).all()
+    return render_template('index.html', teachers=teachers)
+
 
 
 # =============================================================================
@@ -192,6 +289,7 @@ if __name__ == '__main__':
 # Student.query.count()                  - Count records
 #
 # =============================================================================
+
 
 
 # =============================================================================

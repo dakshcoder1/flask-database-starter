@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Student - Part 3</title>
+    <title>Edit Student - Part 3</title>
     <style>
 /* ===== PAGE CENTERING ===== */
 body {
@@ -11,10 +11,9 @@ body {
 
     /* center form */
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 
-    /* premium background */
     background: radial-gradient(circle at top, #1e293b, #020617);
     color: #e5e7eb;
 }
@@ -22,35 +21,47 @@ body {
 /* ===== HEADING ===== */
 h1 {
     position: absolute;
-    top: 40px;
+    top: 30px;
     color: #f8fafc;
     text-shadow: 0 4px 12px rgba(0,0,0,0.6);
 }
 
-/* ===== FORM (3D CARD) ===== */
+/* ===== FORM CARD ===== */
 form {
     background: linear-gradient(145deg, #111827, #1f2937);
-    padding: 35px;
+    padding: 32px;
     border-radius: 18px;
     max-width: 420px;
     width: 100%;
 
-    /* 3D depth */
+    /* 3D + glass effect */
     box-shadow:
-        0 25px 50px rgba(0,0,0,0.7),
+        0 25px 60px rgba(0,0,0,0.8),
         inset 0 1px 1px rgba(255,255,255,0.15);
 
     border: 1px solid rgba(255,255,255,0.1);
     backdrop-filter: blur(12px);
 
+    transform: perspective(1000px) translateZ(0);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 form:hover {
-    transform: translateY(-6px) scale(1.01);
+    transform: perspective(1000px) translateZ(12px);
     box-shadow:
-        0 35px 70px rgba(0,0,0,0.85),
+        0 35px 80px rgba(0,0,0,0.9),
         inset 0 1px 1px rgba(255,255,255,0.2);
+}
+
+/* ===== INFO BOX ===== */
+.info {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 22px;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(14,165,233,0.5);
 }
 
 /* ===== LABELS ===== */
@@ -67,7 +78,7 @@ select {
     width: 100%;
     padding: 12px;
     margin-bottom: 20px;
-    border-radius: 10px;
+    border-radius: 12px;
     box-sizing: border-box;
 
     background: #020617;
@@ -84,20 +95,20 @@ select {
 input:focus,
 select:focus {
     outline: none;
-    border-color: #22c55e;
+    border-color: #8b5cf6;
     box-shadow:
-        0 0 0 2px rgba(34,197,94,0.35),
+        0 0 0 2px rgba(139,92,246,0.35),
         inset 0 2px 6px rgba(0,0,0,0.6);
 }
 
 /* ===== BUTTONS ===== */
 .btn {
-    padding: 12px 26px;
+    padding: 13px 28px;
     border: none;
     border-radius: 30px;
     cursor: pointer;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
     display: inline-block;
 
     box-shadow:
@@ -110,7 +121,7 @@ select:focus {
 .btn:hover {
     transform: translateY(-3px);
     box-shadow:
-        0 16px 35px rgba(0,0,0,0.8),
+        0 18px 40px rgba(0,0,0,0.9),
         inset 0 1px 1px rgba(255,255,255,0.25);
 }
 
@@ -128,27 +139,30 @@ select:focus {
 }
 </style>
 
+</head>
 <body>
-    <h1>Add New Student</h1>
+    <h1>Edit Teacher</h1>
 
     <form method="POST">
+        <div class="info">Editing: {{ teacher.name }} (ID: {{ teacher.id }})</div>
+
         <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
+        <input type="text" id="name" name="name" value="{{ teacher.name }}" required>
 
         <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" id="email" name="email" value="{{ teacher.email }}" required>
 
         <label for="course_id">Course:</label>
         <select id="course_id" name="course_id" required>
-            <option value="">-- Select Course --</option>
             {% for course in courses %}
-                <option value="{{ course.id }}">{{ course.name }}</option>  <!-- Dropdown from database -->
+                <option value="{{ course.id }}" {% if course.id == teacher.course_id %}selected{% endif %}>
+                    {{ course.name }}
+                </option>  <!-- Pre-select current course -->
             {% endfor %}
         </select>
 
-        <button type="submit" class="btn btn-submit">Add Student</button>
+        <button type="submit" class="btn btn-submit">Update teacher</button>
         <a href="{{ url_for('index') }}" class="btn btn-cancel">Cancel</a>
     </form>
-
-    </body>
+</body>
 </html>

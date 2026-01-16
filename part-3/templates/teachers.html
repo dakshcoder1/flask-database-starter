@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Part 3 - Flask-SQLAlchemy ORM</title>
+    
     <style>
     body {
         font-family: "Segoe UI", Arial, sans-serif;
@@ -149,12 +150,13 @@
 
 </head>
 <body>
-    <h1>Student Management (Part 3 - SQLAlchemy ORM)</h1>
+    <h1>Teacher</h1>    
 
     <nav>
         <a href="{{ url_for('index') }}">Students</a>
         <a href="{{ url_for('courses') }}">Courses</a>
         <a href="{{ url_for('teachers') }}">Teachers</a>
+
     </nav>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -165,55 +167,9 @@
         {% endif %}
     {% endwith %}
 
-    <a href="{{ url_for('add_student') }}" class="btn btn-add">+ Add New Student</a>
-
-    {% if students %}
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Course</th>
-                <th>Actions</th>
-            </tr>
-            {% for student in students %}
-            <tr>
-                <td>{{ student.id }}</td>  <!-- ORM uses dot notation! -->
-                <td>{{ student.name }}</td>
-                <td>{{ student.email }}</td>
-                <td><span class="course-badge">{{ student.course.name }}</span>
-                    
-                    <li><span>Show Teacher Teaching This Course:-</span></li>
-
-                    {% for teacher in student.course.teachers %}
-                    <li>{{ teacher.name }}</li>
-                    {% else %}
-                    <li>No teacher enrolled</li>
-                    {% endfor %}
-                </ul>            
-                </td>
-                <td>
-                    <a href="{{ url_for('edit_student', id=student.id) }}" class="btn btn-edit">Edit</a>
-                    <a href="{{ url_for('delete_student', id=student.id) }}" class="btn btn-delete"
-                       onclick="return confirm('Delete this student?')">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% else %}
-        <p class="empty">No students yet. Add one!</p>
-    {% endif %}
-    
-    
-
-
-
-    <hr>
-    <br/>
-    
-    
     <a href="{{ url_for('add_teacher') }}" class="btn btn-add">+ Add New Teacher</a>
 
+   
     {% if teachers %}
         <table>
             <tr>
@@ -228,7 +184,17 @@
                 <td>{{ teacher.id }}</td>  <!-- ORM uses dot notation! -->
                 <td>{{ teacher.name }}</td>
                 <td>{{ teacher.email }}</td>
-                <td><span class="course-badge">{{ teacher.course.name }}</span></td>  <!-- Access related course! -->
+                <td><span class="course-badge">{{ teacher.course.name }}</span>  <!-- Access related course! -->
+                    <ul>
+                        
+                        {% for student in teacher.course.students %}
+                        <li>{{ student.name }}</li>
+                        {% else %}
+                        <li>No students enrolled</li>
+                        {% endfor %}
+                    </ul>            
+                </td>
+
                 <td>
                     <a href="{{ url_for('edit_teacher', id=teacher.id) }}" class="btn btn-edit">Edit</a>
                     <a href="{{ url_for('delete_teacher', id=teacher.id) }}" class="btn btn-delete"
@@ -242,14 +208,6 @@
     {% endif %}
 
     <hr>
-    <p><strong>Notice:</strong> We use <code>teacher.course.name</code> to access the related course - that's the power of ORM relationships!</p>
+    <p><strong>Relationship Demo:</strong> <code>course.teachers</code> automatically fetches teachers in each course!</p>
 </body>
-{% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
 </html>
