@@ -3,30 +3,136 @@
 <head>
     <title>Part 5 - PostgreSQL/MySQL Config</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #263238; color: #eceff1; }
-        h1 { color: #80cbc4; }
-        .db-info { background: #37474f; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #80cbc4; }
-        .db-info h3 { margin: 0 0 10px 0; color: #80cbc4; }
-        .db-type { display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
-        .db-type.postgresql { background: #336791; }
-        .db-type.mysql { background: #4479a1; }
-        .db-type.sqlite { background: #003b57; }
-        .db-url { font-family: monospace; font-size: 12px; color: #90a4ae; word-break: break-all; margin-top: 10px; }
-        table { border-collapse: collapse; width: 100%; background: #37474f; margin-top: 20px; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #455a64; }
-        th { background: #455a64; color: #80cbc4; }
-        .btn { display: inline-block; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin: 5px; }
-        .btn-add { background: #26a69a; color: white; }
-        .btn-delete { background: #ef5350; color: white; }
-        .flash { padding: 15px; margin: 15px 0; border-radius: 4px; }
-        .flash.success { background: #a5d6a7; color: #1b5e20; }
-        .flash.danger { background: #ef9a9a; color: #b71c1c; }
-        .price { color: #81c784; font-weight: bold; }
-        .stock { color: #90a4ae; }
+:root {
+    --primary: #80cbc4;
+    --accent: #4fc3f7;
+    --danger: #ff5252;
+    --success: #69f0ae;
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+body { 
+    font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+    margin: 0;
+    padding: 40px;
+    /* Animated Mesh Gradient Background */
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    background-attachment: fixed;
+    color: #e0e0e0; 
+    min-height: 100vh;
+}
+
+h1 { 
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(to right, #80cbc4, #4fc3f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 5px 15px rgba(128, 203, 196, 0.3));
+    margin-bottom: 30px;
+}
+
+/* Advanced Glassmorphism Card */
+.db-info { 
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 25px; 
+    border-radius: 20px; 
+    margin-bottom: 30px; 
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease;
+}
+
+.db-info:hover {
+    transform: translateY(-5px);
+}
+
+/* 3D Neomorphic Buttons */
+.btn { 
+    display: inline-block; 
+    padding: 12px 25px; 
+    text-decoration: none; 
+    border-radius: 12px; 
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.btn-add { background: linear-gradient(145deg, #26a69a, #00897b); color: white; }
+.btn-edit { background: linear-gradient(145deg, #4fc3f7, #0288d1); color: white; }
+.btn-delete { background: linear-gradient(145deg, #ff5252, #d32f2f); color: white; }
+
+.btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    filter: brightness(1.2);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* The "Floating Row" Table */
+table { 
+    border-collapse: separate; 
+    border-spacing: 0 12px; 
+    width: 100%; 
+}
+
+th { 
+    padding: 20px 20px;
+    text-align: left;
+    color: var(--primary);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+}
+
+td { 
+    background: rgba(255, 255, 255, 0.03);
+    padding: 20px; 
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(5px);
+}
+
+/* Rounded corners for floating rows */
+td:first-child { border-radius: 15px 0 0 15px; border-left: 1px solid var(--glass-border); }
+td:last-child { border-radius: 0 15px 15px 0; border-right: 1px solid var(--glass-border); }
+
+tr:hover td {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(1.01);
+    transition: all 0.3s ease;
+    border-color: var(--primary);
+}
+
+/* Data Styling */
+.price { color: var(--success); font-weight: 700; font-family: 'Courier New', monospace; font-size: 1.2rem; }
+.stock { color: #ffa726; font-weight: 500; }
+
+/* Flash Messages with Blur */
+.flash {
+    padding: 15px 25px;
+    border-radius: 12px;
+    margin: 20px 0;
+    backdrop-filter: blur(10px);
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
     </style>
 </head>
 <body>
-    <h1>Product Inventory (Part 5)</h1>
+    <h1>Product Inventory</h1>
 
     <div class="db-info">
         <h3>Current Database:</h3>
@@ -63,6 +169,7 @@
             <td class="stock">{{ product.stock }} units</td>
             <td>{{ product.description or '-' }}</td>
             <td>
+                <a href="{{ url_for('edit_product', id=product.id) }}" class="btn btn-edit">Edit</a>
                 <a href="{{ url_for('delete_product', id=product.id) }}" class="btn btn-delete"
                    onclick="return confirm('Delete this product?')">Delete</a>
             </td>

@@ -97,6 +97,53 @@ def add_product():
 
     return render_template('add.html')
 
+'''
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit_product(id):
+    # fetch existing product otherwise return 404
+    product=Product.query.get_or_404(id)
+    if request.method == 'POST':
+        try:
+            product.name=request.form['name'],
+            product.price=float(request.form['price']),
+            product.stock=int(request.form.get('stock', 0)),
+            product.description=request.form.get('description', '')
+            
+            
+            db.session.commit()
+            flash('Product edited!', 'success')
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating product:{str(e)}', 'danger')
+            return render_template('edit.html',product=product)
+'''
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit_product(id):
+    # 1. Fetch the product
+    product = Product.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        try:
+            # 2. Update attributes (Make sure there are NO commas at the end of these lines)
+            product.name = request.form['name']
+            product.price = float(request.form['price'])
+            product.stock = int(request.form.get('stock', 0))
+            product.description = request.form.get('description', '')
+            
+            # 3. Commit to DB
+            db.session.commit()
+            flash('Product updated successfully!', 'success')
+            return redirect(url_for('index')) # Return 1: After successful POST
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating product: {str(e)}', 'danger')
+            # If commit fails, it will continue to the final return below
+    
+    # 4. FINAL RETURN: This handles the initial page load (GET) 
+    # AND any failed POST attempts. It MUST be at this indentation level.
+    return render_template('edit.html', product=product) # Return 2: For GET or Error
 
 @app.route('/delete/<int:id>')
 def delete_product(id):

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+<style>
+    /* ====== GLOBAL STYLES ====== */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background: #0f0c29;  /* dark gradient */
+        background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        color: #fff;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    /* ====== NAVBAR ====== */
+    nav {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        padding: 15px 30px;
+        background: rgba(0,0,0,0.4);
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    nav a {
+        color: #10cdee;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    nav a:hover {
+        color: #f9d423;
+        text-shadow: 0 0 8px rgba(249,212,35,0.7);
+    }
+
+    /* ====== SEARCH BOX ====== */
+    .search-box {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .search-box input {
+        width: 60%;
+        padding: 12px 18px;
+        border-radius: 30px;
+        border: none;
+        outline: none;
+        font-size: 16px;
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+        transition: all 0.3s;
+        box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+    }
+
+    .search-box input::placeholder {
+        color: #ccc;
+    }
+
+    .search-box input:focus {
+        background: rgba(255,255,255,0.2);
+        box-shadow: inset 0 0 15px rgba(255,255,255,0.3);
+    }
+
+    /* ====== GRID CONTAINERS ====== */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-top: 20px;
+    }
+
+    h2.section-title {
+        margin-bottom: 15px;
+        color: #f9d423;
+        text-shadow: 0 0 6px rgba(249,212,35,0.8);
+    }
+
+    /* ====== CARD STYLE ====== */
+    .card {
+        background: rgba(255,255,255,0.05);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+        transition: transform 0.3s, box-shadow 0.3s;
+        backdrop-filter: blur(8px);
+    }
+
+    .card:hover {
+        transform: translateY(-10px) rotateX(5deg);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    }
+
+    .card h3 {
+        margin-bottom: 12px;
+        font-size: 20px;
+        color: #1f1bf9;
+        text-shadow: 0 0 8px rgba(255,78,80,0.7);
+    }
+
+    .card p {
+        font-size: 14px;
+        margin-bottom: 8px;
+        line-height: 1.5;
+        color: #fff;
+    }
+
+    .card span {
+        font-weight: bold;
+        color: #a806c8;
+    }
+
+    /* ====== SCROLLBAR FOR GRID ====== */
+    .grid {
+        max-height: 60vh;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .grid::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .grid::-webkit-scrollbar-thumb {
+        background: rgba(249,212,35,0.6);
+        border-radius: 4px;
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media(max-width:600px){
+        .search-box input {
+            width: 90%;
+        }
+    }
+
+</style>
+</head>
+<body>
+
+<!-- SEARCH BAR -->
+<div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search books or authors..." onkeyup="filterData()">
+</div>
+
+<!-- NAVBAR -->
+<nav>
+    <a href="index.html">Dashboard</a>
+    <a href="book.html">Books</a>
+    <a href="author.html">Authors</a>
+</nav>
+
+<!-- BOOKS SECTION -->
+<h2 class="section-title">📚 Books</h2>
+<div class="grid" id="bookList"></div>
+
+<!-- AUTHORS SECTION -->
+<h2 class="section-title">✍️ Authors</h2>
+<div class="grid" id="authorList"></div>
+
+<script>
+    let books = [];
+    let authors = [];
+
+    // Fetch Books
+    fetch("http://127.0.0.1:5000/api/books")
+        .then(res => res.json())
+        .then(data => {
+            books = data.books;
+            renderBooks(books);
+        })
+        .catch(err => console.error("Books error:", err));
+
+    // Fetch Authors
+    fetch("http://127.0.0.1:5000/api/authors")
+        .then(res => res.json())
+        .then(data => {
+            authors = data.authors;
+            renderAuthors(authors);
+        })
+        .catch(err => console.error("Authors error:", err));
+
+    function renderBooks(data) {
+        const list = document.getElementById("bookList");
+        list.innerHTML = "";
+        data.forEach(book => {
+            list.innerHTML += `
+                <div class="card">
+                    <h3>${book.title}</h3>
+                    <p><span>Year:</span> ${book.year || "N/A"}</p>
+                    <p><span>Author:</span> ${book.author ? book.author.name : "Unknown"}</p>
+                    <p><span>ISBN:</span> ${book.isbn || "N/A"}</p>
+                </div>
+            `;
+        });
+    }
+
+    function renderAuthors(data) {
+        const list = document.getElementById("authorList");
+        list.innerHTML = "";
+        data.forEach(author => {
+            list.innerHTML += `
+                <div class="card">
+                    <h3>${author.name}</h3>
+                    <p><span>City:</span> ${author.city || "N/A"}</p>
+                    <p><span>Total Books:</span> ${author.books.length}</p>
+                </div>
+            `;
+        });
+    }
+
+    function filterData() {
+        const value = document.getElementById("searchInput").value.toLowerCase();
+
+        const filteredBooks = books.filter(b => b.title.toLowerCase().includes(value));
+        const filteredAuthors = authors.filter(a => a.name.toLowerCase().includes(value));
+
+        renderBooks(filteredBooks);
+        renderAuthors(filteredAuthors);
+    }
+</script>
+
+</body>
+</html>
